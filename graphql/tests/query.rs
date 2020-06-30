@@ -757,7 +757,7 @@ fn query_complexity() {
 #[tokio::test]
 async fn query_complexity_subscriptions() {
     let logger = Logger::root(slog::Discard, o!());
-    let store_resolver = StoreResolver::new(&logger, STORE.clone());
+    let store_resolver = StoreResolver::for_subscription(&logger, STORE.clone());
 
     let query = Query::new(
         Arc::new(api_test_schema()),
@@ -780,7 +780,7 @@ async fn query_complexity_subscriptions() {
     let max_complexity = Some(1_010_100);
     let options = SubscriptionExecutionOptions {
         logger: logger.clone(),
-        resolver: store_resolver.clone(),
+        resolver: store_resolver,
         timeout: None,
         max_complexity,
         max_depth: 100,
@@ -814,6 +814,8 @@ async fn query_complexity_subscriptions() {
         .unwrap(),
         None,
     );
+
+    let store_resolver = StoreResolver::for_subscription(&logger, STORE.clone());
 
     let options = SubscriptionExecutionOptions {
         logger,
@@ -1127,7 +1129,7 @@ fn cannot_filter_by_derved_relationship_fields() {
 #[tokio::test]
 async fn subscription_gets_result_even_without_events() {
     let logger = Logger::root(slog::Discard, o!());
-    let store_resolver = StoreResolver::new(&logger, STORE.clone());
+    let store_resolver = StoreResolver::for_subscription(&logger, STORE.clone());
 
     let query = Query::new(
         Arc::new(api_test_schema()),
@@ -1144,7 +1146,7 @@ async fn subscription_gets_result_even_without_events() {
 
     let options = SubscriptionExecutionOptions {
         logger: logger.clone(),
-        resolver: store_resolver.clone(),
+        resolver: store_resolver,
         timeout: None,
         max_complexity: None,
         max_depth: 100,
